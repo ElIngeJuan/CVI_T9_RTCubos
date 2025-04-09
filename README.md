@@ -55,4 +55,3 @@ magick image.ppm image.png
 
 ---
 
-¿Quieres que también añada instrucciones para Visual Studio con la GUI o solo lo dejamos con terminal?
