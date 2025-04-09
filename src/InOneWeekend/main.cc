@@ -5,18 +5,15 @@
 #include "material.h"
 #include "quad.h"
 
-// Genera una caja con su material
 shared_ptr<hittable> make_box(const point3& p0, const point3& p1, shared_ptr<material> mat) {
     return box(p0, p1, mat);
 }
 
-// Genera el plano del suelo
 shared_ptr<hittable> create_ground() {
     auto ground_mat = make_shared<lambertian>(color(0.5, 0.5, 0.5));
     return make_box(point3(-25, -0.01, -25), point3(25, 0, 25), ground_mat);
 }
 
-// Genera una colección de cajas aleatorias distribuidas en una cuadrícula
 hittable_list generate_random_scene() {
     hittable_list objects;
 
@@ -29,26 +26,19 @@ hittable_list generate_random_scene() {
                 shared_ptr<material> mat;
 
                 if (choose_mat < 0.8) {
-                    // Diffuse
                     auto albedo = color::random() * color::random();
                     mat = make_shared<lambertian>(albedo);
                 } else if (choose_mat < 0.95) {
-                    // Metal
                     auto albedo = color::random(0.5, 1.0);
                     auto fuzz = random_double(0, 0.5);
                     mat = make_shared<metal>(albedo, fuzz);
                 } else {
-                    // Glass
                     mat = make_shared<dielectric>(1.5);
                 }
 
-                // Define una caja centrada en el origen
                 auto raw_box = make_box(point3(-0.2, 0.0, -0.2), point3(0.2, 0.4, 0.2), mat);
                 
-                // Rota la caja 45 grados alrededor del eje Y
                 raw_box = make_shared<rotate_y>(raw_box, 45);
-
-                // Traslada la caja al centro deseado
                 raw_box = make_shared<translate>(raw_box, center);
 
                 objects.add(raw_box);
@@ -60,32 +50,28 @@ hittable_list generate_random_scene() {
 }
 
 
-// Añade objetos principales visibles en primer plano
 void add_main_objects(hittable_list& world) {
     auto glass = make_shared<dielectric>(1.5);
     auto diffuse = make_shared<lambertian>(color(0.4, 0.2, 0.1));
     auto metal_mat = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
 
-    // Caja de vidrio rotada
     auto glass_box = make_box(point3(-0.5, 0.0, -0.5), point3(0.5, 1.0, 0.5), glass);
     glass_box = make_shared<rotate_y>(glass_box, 45);
     glass_box = make_shared<translate>(glass_box, vec3(0, 0, 0));
     world.add(glass_box);
 
-    // Caja difusa rotada
     auto diffuse_box = make_box(point3(-0.5, 0.0, -0.5), point3(0.5, 1.0, 0.5), diffuse);
     diffuse_box = make_shared<rotate_y>(diffuse_box, 45);
     diffuse_box = make_shared<translate>(diffuse_box, vec3(-4, 0, 0));
     world.add(diffuse_box);
 
-    // Caja metálica rotada
     auto metal_box = make_box(point3(-0.5, 0.0, -0.5), point3(0.5, 1.0, 0.5), metal_mat);
     metal_box = make_shared<rotate_y>(metal_box, 45);
     metal_box = make_shared<translate>(metal_box, vec3(4, 0, 0));
     world.add(metal_box);
 }
 
-// Configura la cámara
+
 camera setup_camera() {
     camera cam;
 
